@@ -52,7 +52,8 @@ if __name__ == "__main__":
     # 初始化Decoder_layer
     decoder_layer = DecoderLayer(d_model=d_model, num_heads=n_heads, d_ff=d_ff)
 
-    # 生成掩码(tat_mask: 下三角掩码?)
+    # 生成掩码(tat_mask: 下三角掩码)
+    # tril: Triangle Lower(下三角)
     tgt_mask = torch.tril(torch.ones(max_len, max_len), diagonal=0).unsqueeze(0).bool()     # (1, max_len, max_len); torch.tril(): 只保留下三角部分,上三角和对角线为0, 即被遮掩。 
     src_mask = None
 
