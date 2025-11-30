@@ -11,7 +11,7 @@ class PositionalEncoding(nn.Module):
         pe = torch.zeros(max_len, d_model)
 
         # 生成位置索引(max_len, 1):: 后续通过获取正弦/余弦函数时 会通过广播扩散1
-        position = torch.arrange(0, max_len, dtype=torch.float).unsqueeze(1)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
 
         # 计算频率缩放因子
         ## torch.log(10000): ln(10000);  torch.arange()默认生成整数,后续torch.log()和torch.exp()运算浮点数, 因此需要强制.float()转换。
@@ -24,7 +24,7 @@ class PositionalEncoding(nn.Module):
         pe[:, 1::2] = torch.cos(position * div_term)
 
         # 增加batch维度(1, max_len, d_model)
-        pr = pr.unsqueeze(0)
+        pe = pe.unsqueeze(0)
 
         # 注册为缓冲区(不参与梯度更新)
         self.register_buffer('pe', pe)

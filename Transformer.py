@@ -71,9 +71,37 @@ class Transformer(nn.Module):
         for dec_layer in self.decoder_layers:
             dec_output = dec_layer(dec_input, enc_output, src_mask, tgt_mask)
 
+        # 3. 输出线性投影
+        output = self.linear(dec_output)    # (batch_size, tgt_len, tgt_vocab_size)
+        return output
+    
 
+if __name__ == "__main__":
+    src_vocab_size = 5000
+    tgt_vocab_size = 5000
+    d_model = 512
+    num_heads = 8
+    num_layers = 6
+    d_ff = 2048
+    max_len = 100
+    dropout = 0.1
 
+    # 初始化Transformer模型
+    transformer = Transformer(src_vocab_size, tgt_vocab_size, d_model, num_heads, num_layers, d_ff, max_len, dropout)
 
+    # 生成随机示例数据(batch_size=5, seq_len=100)
+    ## torch.randint(low, high, size): 生成low-high间的随机整数， 形状为size的张量
+    Current_Seq_Len=50
+    src_data = torch.randint(1, src_vocab_size, (5, Current_Seq_Len))  # 输入序列（避免0，0为填充）
+    tgt_data = torch.randint(1, tgt_vocab_size, (5, Current_Seq_Len+10))  # 目标序列
+
+    # 模型前向传播（目标序列右移一位作为输入）
+    output = transformer(src_data, tgt_data[:, :-1])    # [:, :-1] 去掉每一行的最后一个元素
+    print(f"src_data.shape: {src_data.shape}")  # torch.Size([5, 50])
+    print(f"tgt_data[:, :-1].shape: {tgt_data[:, :-1].shape}")  # torch.Size([5, 59])
+
+    print("模型输出形状：", output.shape)  # (batch_size, tgt_len-1, tgt_vocab_size)    torch.Size([5, 59, 5000])
+    print("模型参数量：", sum(p.numel() for p in transformer.parameters()) / 1e6, "M")  # 51.823496 M
 
 
 
